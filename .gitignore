@@ -6,7 +6,11 @@
 [Bb]uilds/
 [Ll]ogs/
 [Uu]ser[Ss]ettings/
+
+# MemoryCaptures can get excessive in size
 [Mm]emoryCaptures/
+
+# Recordings can get excessive in size
 [Rr]ecordings/
 
 # Asset meta data should only be ignored when the corresponding asset is also ignored
@@ -48,31 +52,7 @@ sysinfo.txt
 crashlytics-build.properties
 
 # Packed Addressables
-/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
+[Aa]ddressables[Aa]ssets[Dd]ata/*/*.bin*
 
-# TextMeshPro
-/[Aa]ssets/TextMesh Pro/
-
-# Rider
-.idea/
-*.sln.iml
-
-# Visual Studio Code
-.vscode/
-
-# macOS
-.DS_Store
-.AppleDouble
-.LSOverride
-
-# Windows
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-
-# Plastic SCM
-*.ignore
-
-# JetBrains Rider
-.idea/
-*.sln.iml
+# Temporary auto-save
+[Aa]uto[Ss]ave[Ff]iles/
