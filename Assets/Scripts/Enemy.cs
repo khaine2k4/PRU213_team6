@@ -1,51 +1,61 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-         [SerializeField] private float speed = 5f;
-         [SerializeField] private float distance = 5f;
-        private  Vector3 startPos ;
-        private bool movingRight = true;  
-        private Rigidbody2D rb;
-        private Animator animator;
-        private GameManager gameManager;    
-      
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    [SerializeField] private float speed = 5f;
+    [SerializeField] private float distance = 5f;
+   // [SerializeField] private float damage = 1f; // Sát thương gây ra
+    private Vector3 startPos;
+    private bool movingRight = true;
+
     void Start()
     {
         startPos = transform.position;
-      
     }
 
-    // Update is called once per frame
     void Update()
     {
         float leftBound = startPos.x - distance;
         float rightBound = startPos.x + distance;
-        if( movingRight)
-          {
+
+        if (movingRight)
+        {
             transform.Translate(Vector3.right * speed * Time.deltaTime);
-            if(transform.position.x >= rightBound)
+            if (transform.position.x >= rightBound)
             {
                 movingRight = false;
-                Flip(); 
+                Flip();
             }
-          } 
-          else
-          {
+        }
+        else
+        {
             transform.Translate(Vector3.left * speed * Time.deltaTime);
-            if(transform.position.x <= leftBound)
+            if (transform.position.x <= leftBound)
             {
                 movingRight = true;
                 Flip();
             }
-          }   
+        }
+    }
 
-          void Flip(){
-            Vector3 scale = transform.localScale;
-            scale.x *= -1;
-            transform.localScale = scale;
-          }  
+    private void Flip()
+    {
+        Vector3 scale = transform.localScale;
+        scale.x *= -1;
+        transform.localScale = scale;
+    }
 
+    // Hàm xử lý va chạm
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            Health playerHealth = collision.gameObject.GetComponent<Health>();
+            if (playerHealth != null)
+            {
+                // Trừ 1 máu thay vì kết thúc game ngay
+                playerHealth.TakeDamage(1);
+            }
+        }
     }
 }

@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
@@ -25,15 +25,20 @@ public class PlayerController : MonoBehaviour
     }
 
     // Update is called once per frame
+    
     void Update()
-    { 
-        if(gameManager.IsGameOver() || gameManager.IsGameWin()  )
-        {
-            return;
-        }
-        HandleMovement(); 
+    {
+        if (gameManager.IsGameOver() || gameManager.IsGameWin()) return;
+
+        HandleMovement();
         HandleJump();
         UpdateAnimation();
+
+        // Test: Nhấn H để mất 1 máu (giảm 0.1 đơn vị thanh máu)
+        if (Input.GetKeyDown(KeyCode.H))
+        {
+            GetComponent<Health>().TakeDamage(1);
+        }
     }
 
     private void HandleMovement()
@@ -66,4 +71,6 @@ public class PlayerController : MonoBehaviour
         bool isJumping = !isGrounded;
         animator.SetBool("isJumping", isJumping);   
     }
+  
+
 }
