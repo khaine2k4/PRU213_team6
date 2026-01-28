@@ -1,14 +1,16 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class PlayerCollision : MonoBehaviour
 {
      private GameManager gameManager;
          private AudioManager audioManager;
-     private void Awake()
+    private Health playerHealth; 
+    private void Awake()
      {
         gameManager = FindAnyObjectByType<GameManager>(); 
-        audioManager = FindAnyObjectByType<AudioManager>(); 
-     }
+        audioManager = FindAnyObjectByType<AudioManager>();
+        playerHealth = GetComponent<Health>(); 
+    }
          
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -19,17 +21,23 @@ public class PlayerCollision : MonoBehaviour
             // Debug.Log("Coin");
             audioManager.playcoinsound();
         }
-        if(collision.CompareTag("Trap"))
+        if (collision.CompareTag("Trap"))
         {
-             gameManager.GameOver();    
-            // Debug.Log("Ban da dinh bay");
+            if (playerHealth != null)
+            {
+                playerHealth.TakeDamage(1); // Trừ 1 máu
+            }
         }
-         if(collision.CompareTag("Enemy"))
+
+        // Chạm Kẻ địch (Enemy) - CHỈ TRỪ MÁU
+        if (collision.CompareTag("Enemy"))
         {
-             gameManager.GameOver();    
-            // Debug.Log("Ban da dinh bay");
+            if (playerHealth != null)
+            {
+                playerHealth.TakeDamage(1); // Trừ 1 máu
+            }
         }
-         if(collision.CompareTag("Key"))
+        if (collision.CompareTag("Key"))
         {
             gameManager.GameWin();  
               Debug.Log("wimnnnn");
@@ -37,5 +45,6 @@ public class PlayerCollision : MonoBehaviour
            
         }
     }
+
     
 }
