@@ -98,12 +98,19 @@ public class PlayerController : MonoBehaviour
         {
             Debug.Log("Đánh trúng: " + enemyCollider.name);
 
-            Enemy enemyScript = enemyCollider.GetComponent<Enemy>();
-
-            if (enemyScript != null)
+            BossController boss = enemyCollider.GetComponent<BossController>();
+            if (boss != null)
             {
-                enemyScript.TakeDamage(currentDamage);
+                boss.TakeDamage(currentDamage);
+                continue;
             }
+
+            Enemy enemy = enemyCollider.GetComponent<Enemy>();
+            if (enemy != null)
+            {
+                enemy.TakeDamage(currentDamage);
+            }
+
         }
     }
 
