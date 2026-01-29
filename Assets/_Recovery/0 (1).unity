@@ -9013,7 +9013,6 @@ GameObject:
   - component: {fileID: 1068266725}
   - component: {fileID: 1068266724}
   - component: {fileID: 1068266723}
-  - component: {fileID: 1068266728}
   m_Layer: 7
   m_Name: Boss
   m_TagString: Enemy
@@ -9035,7 +9034,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   rb: {fileID: 0}
   player: {fileID: 0}
-  animator: {fileID: 0}
   maxHealth: 300
   healthBarFill: {fileID: 722974050}
   touchDamage: 1
@@ -9052,7 +9050,6 @@ MonoBehaviour:
   chargeHitboxExtraWidth: 0.2
   chargeCooldown: 2
   loopDelay: 0.3
-  destroyDelay: 1
 --- !u!61 &1068266724
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -9091,8 +9088,8 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.8933333, y: 0.6933333}
-    newSize: {x: 0.8933333, y: 0.6933333}
+    oldSize: {x: 1.35, y: 1.11}
+    newSize: {x: 0.07, y: 0.06}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
@@ -9175,15 +9172,15 @@ SpriteRenderer:
   m_SortingLayer: 4
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -5544493848932956180, guid: 9cd65660bbcab1b488480193e80e7681, type: 3}
+  m_Sprite: {fileID: -6248741079362886434, guid: 02db1b686dd10f7418d080036ec11d82, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 0.8933333, y: 0.6933333}
+  m_Size: {x: 0.07, y: 0.06}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_SpriteSortPoint: 0
 --- !u!4 &1068266727
 Transform:
@@ -9201,28 +9198,6 @@ Transform:
   - {fileID: 1371543896}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!95 &1068266728
-Animator:
-  serializedVersion: 7
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1068266722}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 7ba4dc4784b6dd84ea27798830cb171a, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1081929078
 GameObject:
   m_ObjectHideFlags: 0
@@ -27324,7 +27299,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 176, y: -196.00005}
+  m_AnchoredPosition: {x: 176, y: -196.00006}
   m_SizeDelta: {x: -1820, y: -980}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1702576785
