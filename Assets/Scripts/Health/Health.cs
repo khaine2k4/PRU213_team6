@@ -3,7 +3,7 @@
 public class Health : MonoBehaviour
 {
     [SerializeField] private float startingHealth = 10f;
-    public float currentHealth { get; private set; }
+    public float currentHealth { get; set; } // Changed to set accessible
     private Animator anim;
     private GameManager gameManager;
 

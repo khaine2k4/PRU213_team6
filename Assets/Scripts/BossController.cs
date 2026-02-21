@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class BossController : MonoBehaviour
+public class BossController : MonoBehaviour, ISaveable
 {
     [Header("References")]
     [SerializeField] private Rigidbody2D rb;
@@ -257,5 +257,51 @@ public class BossController : MonoBehaviour
         Gizmos.color = Color.red;
         Vector2 center = (Vector2)transform.position + GetFacingOffset(meleeHitboxOffset);
         Gizmos.DrawWireCube(center, meleeHitboxSize);
+    }
+
+    // ===== ISaveable Implementation =====
+    public object SaveData()
+    {
+        BossData data = new BossData
+        {
+            exists = true,
+            posX = transform.position.x,
+            posY = transform.position.y,
+            posZ = transform.position.z,
+            currentHealth = currentHealth,
+            maxHealth = maxHealth,
+            facingRight = facingRight,
+            isDead = currentHealth <= 0
+        };
+        return data;
+    }
+
+    public void LoadData(object data)
+    {
+        if (data is BossData bossData)
+        {
+            // Restore position
+            transform.position = new Vector3(bossData.posX, bossData.posY, bossData.posZ);
+
+            // Restore health
+            currentHealth = bossData.currentHealth;
+            maxHealth = bossData.maxHealth;
+            UpdateHealthBar();
+
+            // Restore facing direction
+            facingRight = bossData.facingRight;
+            Vector3 scale = transform.localScale;
+            scale.x = Mathf.Abs(scale.x) * (facingRight ? 1 : -1);
+            transform.localScale = scale;
+
+            // If boss was alive, restart loop
+            if (!bossData.isDead && currentHealth > 0)
+            {
+                StopAllCoroutines();
+                StartCoroutine(BossLoop());
+            }
+
+            Debug.Log($"Boss loaded! Health: {currentHealth}/{maxHealth}");
+        }
     }
 }
