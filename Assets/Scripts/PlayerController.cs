@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour, ISaveable
 {
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float jumpForce = 15f;
@@ -34,9 +34,11 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        if (weaponOnHand != null && weaponOnHand.activeSelf)
+        // Always hide weapon at start - only show via EquipWeapon() or LoadData()
+        hasWeapon = false;
+        if (weaponOnHand != null)
         {
-            hasWeapon = true;
+            weaponOnHand.SetActive(false);
         }
     }
 
@@ -144,5 +146,51 @@ public class PlayerController : MonoBehaviour
         if (attackPoint == null) return;
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(attackPoint.position, attackRange);
+    }
+
+    // ===== ISaveable Implementation =====
+    public object SaveData()
+    {
+        PlayerData data = new PlayerData
+        {
+            posX = transform.position.x,
+            posY = transform.position.y,
+            posZ = transform.position.z,
+            health = GetComponent<Health>() ? GetComponent<Health>().currentHealth : 10f,
+            damage = currentDamage,
+            hasWeapon = hasWeapon,
+            weaponActive = weaponOnHand != null && weaponOnHand.activeSelf
+        };
+        
+        Debug.Log($"Player Save: Pos({data.posX:F1},{data.posY:F1}), HP:{data.health}, Damage:{data.damage}, Weapon:{data.hasWeapon}");
+        return data;
+    }
+
+    public void LoadData(object data)
+    {
+        if (data is PlayerData playerData)
+        {
+            // Restore position
+            transform.position = new Vector3(playerData.posX, playerData.posY, playerData.posZ);
+
+            // Restore health
+            Health health = GetComponent<Health>();
+            if (health != null)
+            {
+                health.currentHealth = playerData.health;
+            }
+
+            // Restore damage
+            currentDamage = playerData.damage;
+
+            // Restore weapon state
+            hasWeapon = playerData.hasWeapon;
+            if (weaponOnHand != null)
+            {
+                weaponOnHand.SetActive(playerData.weaponActive);
+            }
+
+            Debug.Log($"Player Load: Pos({playerData.posX:F1},{playerData.posY:F1}), HP:{playerData.health}, Damage:{playerData.damage}, Weapon:{playerData.hasWeapon}");
+        }
     }
 }

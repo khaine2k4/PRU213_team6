@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI; 
 
-public class Enemy : MonoBehaviour
+public class Enemy : MonoBehaviour, ISaveable
 {
     [Header("Movement Settings")]
     [SerializeField] private float speed = 5f;
@@ -12,11 +12,21 @@ public class Enemy : MonoBehaviour
     [Header("Health Settings")] 
     [SerializeField] private float maxHealth = 100f; 
     private float currentHealth;
-    [SerializeField] private Image healthBarFill; 
+    [SerializeField] private Image healthBarFill;
+
+    void Awake()
+    {
+        // Save starting position immediately when object is created
+        startPos = transform.position;
+    }
 
     void Start()
     {
-        startPos = transform.position;
+        // startPos already set in Awake
+        if (startPos == Vector3.zero)
+        {
+            startPos = transform.position;
+        }
         currentHealth = maxHealth; 
         UpdateHealthBar();
     }
@@ -96,5 +106,59 @@ public class Enemy : MonoBehaviour
                 playerHealth.TakeDamage(1);
             }
         }
+    }
+
+    // ===== ISaveable Implementation =====
+    public object SaveData()
+    {
+        EnemyData data = new EnemyData
+        {
+            enemyID = GetEnemyID(),
+            posX = transform.position.x,
+            posY = transform.position.y,
+            posZ = transform.position.z,
+            currentHealth = currentHealth,
+            maxHealth = maxHealth,
+            isAlive = currentHealth > 0,
+            movingRight = movingRight
+        };
+        return data;
+    }
+
+    public void LoadData(object data)
+    {
+        if (data is EnemyData enemyData)
+        {
+            // Restore position (current position, not starting position)
+            transform.position = new Vector3(enemyData.posX, enemyData.posY, enemyData.posZ);
+            
+            // IMPORTANT: Don't change startPos! Keep the original starting position
+            // startPos should remain as set in Awake()
+
+            // Restore health
+            currentHealth = enemyData.currentHealth;
+            maxHealth = enemyData.maxHealth;
+            UpdateHealthBar();
+
+            // Restore direction
+            movingRight = enemyData.movingRight;
+            
+            // Make sure sprite is facing correct direction
+            if ((movingRight && transform.localScale.x < 0) || 
+                (!movingRight && transform.localScale.x > 0))
+            {
+                Flip();
+            }
+
+            Debug.Log($"Enemy {enemyData.enemyID} loaded! StartPos: {startPos}, CurrentPos: {transform.position}");
+        }
+    }
+
+    // Public method để SaveManager có thể get ID
+    public string GetEnemyID()
+    {
+        // Use starting position as unique ID
+        Vector3 pos = startPos != Vector3.zero ? startPos : transform.position;
+        return $"Enemy_{pos.x:F2}_{pos.y:F2}";
     }
 }

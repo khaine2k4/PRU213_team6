@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7286469918666303750}
   - component: {fileID: 4065435346555248071}
   - component: {fileID: 7520474730906740600}
+  - component: {fileID: 5495079457391966973}
   m_Layer: 0
   m_Name: Coin
   m_TagString: Coin
@@ -80,7 +81,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: -2082176647
-  m_SortingLayer: 5
+  m_SortingLayer: 6
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: -3338749442709606003, guid: f89cc4f0e1a92cd4d9e2d95dcc12b377, type: 3}
@@ -151,3 +152,15 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &5495079457391966973
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2360593580391655187}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0970744fcea1def4fa0710b4cdc1603a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CoinPickup
