@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 public class PlayerController : MonoBehaviour, ISaveable
 {
@@ -23,6 +24,15 @@ public class PlayerController : MonoBehaviour, ISaveable
     public int currentDamage = 10;
     public GameObject weaponOnHand;
     private bool hasWeapon = false;
+    public float dashForce = 20f;
+    [SerializeField] private float dashDuration = 0.1f;
+
+    private bool isDashing = false;
+
+    [SerializeField] private GameObject dashEffectObject;
+    
+
+
 
     private void Awake()
     {
@@ -40,6 +50,12 @@ public class PlayerController : MonoBehaviour, ISaveable
         {
             weaponOnHand.SetActive(false);
         }
+
+        // Tắt hiệu ứng dash khi bắt đầu
+        if (dashEffectObject != null)
+        {
+            dashEffectObject.SetActive(false);
+        }
     }
 
     void Update()
@@ -49,6 +65,7 @@ public class PlayerController : MonoBehaviour, ISaveable
         HandleMovement();
         HandleJump();
         HandleAttack();
+        HandleDash();
         UpdateAnimation();
 
         if (Input.GetKeyDown(KeyCode.H))
@@ -59,6 +76,8 @@ public class PlayerController : MonoBehaviour, ISaveable
 
     private void HandleMovement()
     {
+        if (isDashing) return;
+
         float moveInput = Input.GetAxis("Horizontal");
         rb.linearVelocity = new Vector2(moveInput * moveSpeed, rb.linearVelocity.y);
         if (moveInput > 0) transform.localScale = new Vector3(1, 1, 1);
@@ -82,6 +101,31 @@ public class PlayerController : MonoBehaviour, ISaveable
             Attack();
             lastAttackTime = Time.time;
         }
+    }
+
+    private void HandleDash()
+    {
+        if (Input.GetKeyDown(KeyCode.LeftShift) && !isDashing)
+        {
+            Dash();
+        }
+    }
+
+    private void Dash()
+    {
+        float dashDirection = transform.localScale.x;
+        rb.linearVelocity = new Vector2(dashForce * dashDirection, rb.linearVelocity.y);
+        isDashing = true;
+        dashEffectObject.SetActive(true);
+        StartCoroutine(StopDash());
+    }
+
+    private IEnumerator StopDash()
+    {
+        yield return new WaitForSeconds(dashDuration);
+        rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+        isDashing = false;
+        dashEffectObject.SetActive(false);  
     }
 
     void Attack()
