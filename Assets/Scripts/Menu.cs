@@ -56,4 +56,12 @@ public class Menu : MonoBehaviour
         UnityEditor.EditorApplication.isPlaying = false;
         #endif
     }
+
+    /// <summary>
+    /// Mở giao diện Cửa hàng bằng cách load Scene Shop
+    /// </summary>
+    public void OpenShopScene()
+    {
+        SceneManager.LoadScene("Shop");
+    }
 }
