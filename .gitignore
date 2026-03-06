@@ -56,3 +56,12 @@ crashlytics-build.properties
 
 # Temporary auto-save
 [Aa]uto[Ss]ave[Ff]iles/
+
+# Visual Studio cache
+.vs/
+
+# Unity recovery
+Assets/_Recovery/
+
+# Generated assets
+GeneratedAssets/
