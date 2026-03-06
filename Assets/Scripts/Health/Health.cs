@@ -10,12 +10,14 @@ public class Health : MonoBehaviour
     [Header("Invincibility")]
     [SerializeField] private float iFramesDuration = 1f; // 1 giây bất tử
     private float iFramesTimer;
+    private AudioManager audioManager;
 
     private void Awake()
     {
         currentHealth = startingHealth;
         anim = GetComponent<Animator>();
         gameManager = FindFirstObjectByType<GameManager>();
+        audioManager = FindFirstObjectByType<AudioManager>();
     }
 
     private void Update()
@@ -35,6 +37,7 @@ public class Health : MonoBehaviour
         if (currentHealth > 0)
         {
             if (anim != null) anim.SetTrigger("Hurt");
+            if (audioManager != null) audioManager.playdamagesound();
             iFramesTimer = iFramesDuration; // Kích hoạt thời gian bất tử
         }
         else

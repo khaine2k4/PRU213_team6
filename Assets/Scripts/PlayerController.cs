@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour, ISaveable
@@ -7,6 +7,10 @@ public class PlayerController : MonoBehaviour, ISaveable
     [SerializeField] private float jumpForce = 15f;
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private Transform groundCheck;
+
+    [Header("Double Jump (Test)")]
+    public int maxExtraJumps = 1;
+    private int currentExtraJumps;
 
     [Header("Combat Settings")]
     [SerializeField] public Transform attackPoint;
@@ -86,12 +90,28 @@ public class PlayerController : MonoBehaviour, ISaveable
 
     private void HandleJump()
     {
+        isGrounded = Physics2D.OverlapCircle(groundCheck.position, 0.2f, groundLayer);
+
+        // Reset số lần nhảy bổ sung nếu đang đứng trên mặt đất
+        if (isGrounded)
+        {
+            currentExtraJumps = maxExtraJumps;
+        }
+
+        // Nhảy thường
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
             if (audioManager) audioManager.playjumpsound();
         }
-        isGrounded = Physics2D.OverlapCircle(groundCheck.position, 0.2f, groundLayer);
+
+        // Nhảy đúp (chỉ để test bằng phím O theo yêu cầu)
+        if (Input.GetKeyDown(KeyCode.O) && currentExtraJumps > 0 && !isGrounded)
+        {
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+            currentExtraJumps--;
+            if (audioManager) audioManager.playjumpsound();
+        }
     }
 
     private void HandleAttack()
