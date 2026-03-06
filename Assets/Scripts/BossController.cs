@@ -24,8 +24,8 @@ public class BossController : MonoBehaviour
     [Header("Melee: 3 hits + step forward")]
     [SerializeField] private int meleeHits = 3;
     [SerializeField] private float meleeHitInterval = 0.35f;
-    [SerializeField] private float meleeStepSpeed = 2.2f;
-    [SerializeField] private float meleeStepTime = 0.20f;
+    [SerializeField] private float meleeStepSpeed = 5f;
+    [SerializeField] private float meleeStepTime = 0.3f;
     [SerializeField] private float meleeHitboxDuration = 0.10f;
     [SerializeField] private Vector2 meleeHitboxSize = new Vector2(1.2f, 1.0f);
     [SerializeField] private Vector2 meleeHitboxOffset = new Vector2(0.9f, 0f);
