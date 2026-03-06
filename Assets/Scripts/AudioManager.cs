@@ -9,6 +9,8 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private AudioClip CoinClip;
     [SerializeField] private AudioClip GameOverClip;
     [SerializeField] private AudioClip GameWinClip;
+    [SerializeField] private AudioClip DamageClip;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -43,6 +45,13 @@ public class AudioManager : MonoBehaviour
         EffectAudioSource.PlayOneShot(GameWinClip);
         }
         
+    public void playdamagesound()
+    {
+        if (DamageClip != null)
+        {
+            EffectAudioSource.PlayOneShot(DamageClip);
+        }
+    }
 }
 
 
