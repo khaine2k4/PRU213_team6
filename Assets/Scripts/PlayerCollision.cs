@@ -18,14 +18,7 @@ public class PlayerCollision : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.CompareTag("Coin"))
-        {
-            gameManager.addScore(1);
-            Destroy(collision.gameObject);
-            // Debug.Log("Coin");
-            audioManager.playcoinsound();
-        }
-
+        // Coin collection is handled by CoinPickup.cs script on each coin
         if (collision.CompareTag("Trap"))
         {
             if (playerHealth != null)

@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour, ISaveable
 {
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float jumpForce = 15f;
@@ -23,6 +24,15 @@ public class PlayerController : MonoBehaviour
     public int currentDamage = 10;
     public GameObject weaponOnHand;
     private bool hasWeapon = false;
+    public float dashForce = 20f;
+    [SerializeField] private float dashDuration = 0.1f;
+
+    private bool isDashing = false;
+
+    [SerializeField] private GameObject dashEffectObject;
+    
+
+
 
     private void Awake()
     {
@@ -34,9 +44,17 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        if (weaponOnHand != null && weaponOnHand.activeSelf)
+        // Always hide weapon at start - only show via EquipWeapon() or LoadData()
+        hasWeapon = false;
+        if (weaponOnHand != null)
         {
-            hasWeapon = true;
+            weaponOnHand.SetActive(false);
+        }
+
+        // Tắt hiệu ứng dash khi bắt đầu
+        if (dashEffectObject != null)
+        {
+            dashEffectObject.SetActive(false);
         }
     }
 
@@ -47,6 +65,7 @@ public class PlayerController : MonoBehaviour
         HandleMovement();
         HandleJump();
         HandleAttack();
+        HandleDash();
         UpdateAnimation();
 
         if (Input.GetKeyDown(KeyCode.H))
@@ -57,6 +76,8 @@ public class PlayerController : MonoBehaviour
 
     private void HandleMovement()
     {
+        if (isDashing) return;
+
         float moveInput = Input.GetAxis("Horizontal");
         rb.linearVelocity = new Vector2(moveInput * moveSpeed, rb.linearVelocity.y);
         if (moveInput > 0) transform.localScale = new Vector3(1, 1, 1);
@@ -80,6 +101,31 @@ public class PlayerController : MonoBehaviour
             Attack();
             lastAttackTime = Time.time;
         }
+    }
+
+    private void HandleDash()
+    {
+        if (Input.GetKeyDown(KeyCode.LeftShift) && !isDashing)
+        {
+            Dash();
+        }
+    }
+
+    private void Dash()
+    {
+        float dashDirection = transform.localScale.x;
+        rb.linearVelocity = new Vector2(dashForce * dashDirection, rb.linearVelocity.y);
+        isDashing = true;
+        dashEffectObject.SetActive(true);
+        StartCoroutine(StopDash());
+    }
+
+    private IEnumerator StopDash()
+    {
+        yield return new WaitForSeconds(dashDuration);
+        rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+        isDashing = false;
+        dashEffectObject.SetActive(false);  
     }
 
     void Attack()
@@ -144,5 +190,51 @@ public class PlayerController : MonoBehaviour
         if (attackPoint == null) return;
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(attackPoint.position, attackRange);
+    }
+
+    // ===== ISaveable Implementation =====
+    public object SaveData()
+    {
+        PlayerData data = new PlayerData
+        {
+            posX = transform.position.x,
+            posY = transform.position.y,
+            posZ = transform.position.z,
+            health = GetComponent<Health>() ? GetComponent<Health>().currentHealth : 10f,
+            damage = currentDamage,
+            hasWeapon = hasWeapon,
+            weaponActive = weaponOnHand != null && weaponOnHand.activeSelf
+        };
+        
+        Debug.Log($"Player Save: Pos({data.posX:F1},{data.posY:F1}), HP:{data.health}, Damage:{data.damage}, Weapon:{data.hasWeapon}");
+        return data;
+    }
+
+    public void LoadData(object data)
+    {
+        if (data is PlayerData playerData)
+        {
+            // Restore position
+            transform.position = new Vector3(playerData.posX, playerData.posY, playerData.posZ);
+
+            // Restore health
+            Health health = GetComponent<Health>();
+            if (health != null)
+            {
+                health.currentHealth = playerData.health;
+            }
+
+            // Restore damage
+            currentDamage = playerData.damage;
+
+            // Restore weapon state
+            hasWeapon = playerData.hasWeapon;
+            if (weaponOnHand != null)
+            {
+                weaponOnHand.SetActive(playerData.weaponActive);
+            }
+
+            Debug.Log($"Player Load: Pos({playerData.posX:F1},{playerData.posY:F1}), HP:{playerData.health}, Damage:{playerData.damage}, Weapon:{playerData.hasWeapon}");
+        }
     }
 }

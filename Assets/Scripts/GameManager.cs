@@ -30,7 +30,16 @@ public class GameManager : MonoBehaviour
 
     private void UpdateScore()
     {
-        scoreText.text = "Score:" + score.ToString();
+        if (scoreText != null)
+        {
+            scoreText.text = "Score:" + score.ToString();
+        }
+    }
+
+    // Public method để SaveManager có thể gọi sau khi load
+    public void UpdateScoreUI()
+    {
+        UpdateScore();
     }   
     
     public void GameOver()
@@ -68,5 +77,5 @@ public class GameManager : MonoBehaviour
     public bool IsGameWin()
     {
         return isGameWin;
-    }   
+    }
 }    
