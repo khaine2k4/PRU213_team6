@@ -57,6 +57,9 @@ public class PlayerData
     public int damage;
     public bool hasWeapon;
     public bool weaponActive;
+    public int currentLevel;
+    public int currentExp;
+    public int expToNextLevel;
 }
 
 /// <summary>

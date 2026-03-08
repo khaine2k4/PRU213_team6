@@ -22,6 +22,9 @@ public class PlayerController : MonoBehaviour, ISaveable
     private AudioManager audioManager;
 
     public int currentDamage = 10;
+    public int currentLevel = 1;
+    public int currentExp = 0;
+    private int expToNextLevel = 10;
     public GameObject weaponOnHand;
     private bool hasWeapon = false;
     public float dashForce = 20f;
@@ -185,6 +188,20 @@ public class PlayerController : MonoBehaviour, ISaveable
         Debug.Log("Đã trang bị vũ khí! Damage mới: " + currentDamage);
     }
 
+    public void GainExp(int amount)
+    {
+        currentExp += amount;
+        while (currentExp >= expToNextLevel)
+        {
+            currentExp -= expToNextLevel;
+            currentLevel++;
+            expToNextLevel *= 2;
+            currentDamage += 1;
+            Debug.Log($"Level Up! Level: {currentLevel}, Damage: {currentDamage}, EXP cần cho level tiếp: {expToNextLevel}");
+        }
+        Debug.Log($"EXP: {currentExp}/{expToNextLevel}");
+    }
+
     private void OnDrawGizmosSelected()
     {
         if (attackPoint == null) return;
@@ -203,10 +220,13 @@ public class PlayerController : MonoBehaviour, ISaveable
             health = GetComponent<Health>() ? GetComponent<Health>().currentHealth : 10f,
             damage = currentDamage,
             hasWeapon = hasWeapon,
-            weaponActive = weaponOnHand != null && weaponOnHand.activeSelf
+            weaponActive = weaponOnHand != null && weaponOnHand.activeSelf,
+            currentLevel = currentLevel,
+            currentExp = currentExp,
+            expToNextLevel = expToNextLevel
         };
         
-        Debug.Log($"Player Save: Pos({data.posX:F1},{data.posY:F1}), HP:{data.health}, Damage:{data.damage}, Weapon:{data.hasWeapon}");
+        Debug.Log($"Player Save: Pos({data.posX:F1},{data.posY:F1}), HP:{data.health}, Damage:{data.damage}, Weapon:{data.hasWeapon}, Level:{data.currentLevel}, EXP:{data.currentExp}/{data.expToNextLevel}");
         return data;
     }
 
@@ -234,7 +254,12 @@ public class PlayerController : MonoBehaviour, ISaveable
                 weaponOnHand.SetActive(playerData.weaponActive);
             }
 
-            Debug.Log($"Player Load: Pos({playerData.posX:F1},{playerData.posY:F1}), HP:{playerData.health}, Damage:{playerData.damage}, Weapon:{playerData.hasWeapon}");
+            // Restore EXP / level
+            currentLevel = playerData.currentLevel > 0 ? playerData.currentLevel : 1;
+            currentExp = playerData.currentExp;
+            expToNextLevel = playerData.expToNextLevel > 0 ? playerData.expToNextLevel : 10;
+
+            Debug.Log($"Player Load: Pos({playerData.posX:F1},{playerData.posY:F1}), HP:{playerData.health}, Damage:{playerData.damage}, Weapon:{playerData.hasWeapon}, Level:{currentLevel}, EXP:{currentExp}/{expToNextLevel}");
         }
     }
 }

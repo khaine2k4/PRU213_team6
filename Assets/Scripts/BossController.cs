@@ -105,6 +105,9 @@ public class BossController : MonoBehaviour, ISaveable
             rb.angularVelocity = 0f;
         }
 
+        PlayerController playerController = FindAnyObjectByType<PlayerController>();
+        if (playerController != null) playerController.GainExp(10);
+
         Debug.Log("Boss die");
         Destroy(gameObject, destroyDelay);
     }

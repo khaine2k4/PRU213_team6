@@ -92,6 +92,8 @@ public class Enemy : MonoBehaviour, ISaveable
     void Die()
     {
         Debug.Log("Enemy đã chết!");
+        PlayerController player = FindAnyObjectByType<PlayerController>();
+        if (player != null) player.GainExp(10);
         Destroy(gameObject);
     }
   
