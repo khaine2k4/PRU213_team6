@@ -36,17 +36,15 @@ public class PlayerCollision : MonoBehaviour
             }
         }
 
-        // FIX: Chạm vào chìa khóa
         if (collision.CompareTag("Key"))
         {
-            hasKey = true; // Cất chìa khóa vào túi
+            hasKey = true;
             Debug.Log("Đã nhặt được chìa khóa!");
-            Destroy(collision.gameObject); // Xóa chìa khóa khỏi màn hình
+            Destroy(collision.gameObject);
 
         }
     }
 
-    // NEW: Hàm xử lý khi tông vào Cánh Cửa (Vì Cửa là vật thể cứng, không có Is Trigger)
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Door"))
