@@ -27,15 +27,53 @@ public class Health : MonoBehaviour
 
     public void TakeDamage(float _damage)
     {
+        TakeDamage(_damage, null);
+    }
+
+    public void TakeDamage(float _damage, Vector2? attackerPosition)
+    {
         // Nếu đang trong thời gian bất tử thì không nhận thêm sát thương
         if (iFramesTimer > 0) return;
 
-        currentHealth = Mathf.Clamp(currentHealth - _damage, 0, startingHealth);
+        float finalDamage = _damage;
+        bool blocked = false;
+
+        PlayerController playerController = GetComponent<PlayerController>();
+        if (playerController != null && playerController.IsBlocking)
+        {
+            bool canBlock = !attackerPosition.HasValue || playerController.CanBlockAttackFrom(attackerPosition.Value);
+            if (canBlock)
+            {
+                blocked = true;
+
+                if (playerController.IsPerfectBlocking)
+                {
+                    finalDamage = 0f;
+                }
+                else
+                {
+                    finalDamage *= Mathf.Clamp01(playerController.BlockedDamageMultiplier);
+                }
+            }
+        }
+
+        currentHealth = Mathf.Clamp(currentHealth - finalDamage, 0, startingHealth);
 
         if (currentHealth > 0)
         {
-            if (anim != null) anim.SetTrigger("Hurt");
-            iFramesTimer = iFramesDuration; // Kích hoạt thời gian bất tử
+            if (finalDamage > 0f && anim != null)
+            {
+                anim.SetTrigger("Hurt");
+            }
+
+            if (blocked)
+            {
+                iFramesTimer = finalDamage <= 0f ? 0.12f : iFramesDuration * 0.5f;
+            }
+            else
+            {
+                iFramesTimer = iFramesDuration;
+            }
         }
         else
         {

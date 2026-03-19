@@ -23,7 +23,7 @@ public class PlayerCollision : MonoBehaviour
         {
             if (playerHealth != null)
             {
-                playerHealth.TakeDamage(1); // Trừ 1 máu
+                playerHealth.TakeDamage(1, collision.transform.position); // Trừ 1 máu
             }
         }
 
@@ -32,7 +32,7 @@ public class PlayerCollision : MonoBehaviour
         {
             if (playerHealth != null)
             {
-                playerHealth.TakeDamage(1); // Trừ 1 máu
+                playerHealth.TakeDamage(1, collision.transform.position); // Trừ 1 máu
             }
         }
 

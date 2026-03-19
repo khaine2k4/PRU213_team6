@@ -105,7 +105,7 @@ public class Enemy : MonoBehaviour, ISaveable
             Health playerHealth = collision.gameObject.GetComponent<Health>();
             if (playerHealth != null)
             {
-                playerHealth.TakeDamage(1);
+                playerHealth.TakeDamage(1, transform.position);
             }
         }
     }
