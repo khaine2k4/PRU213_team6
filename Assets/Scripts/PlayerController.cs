@@ -33,9 +33,12 @@ public class PlayerController : MonoBehaviour, ISaveable
     private bool isDashing = false;
 
     [SerializeField] private GameObject dashEffectObject;
-    
 
-
+    [Header("Ranged Combat (Object Pooling)")]
+    [SerializeField] public bool canShoot = false;
+    [SerializeField] private Transform firePoint;
+    [SerializeField] private GameObject[] fireballs; // Kéo các quả cầu lửa đã tạo sẵn trong Scene vào đây
+  
 
     private void Awake()
     {
@@ -99,11 +102,53 @@ public class PlayerController : MonoBehaviour, ISaveable
 
     private void HandleAttack()
     {
+        // Kiểm tra cooldown và phím bấm (J)
         if (Input.GetKeyDown(KeyCode.J) && Time.time >= lastAttackTime + attackCooldown)
         {
-            Attack();
+            if (canShoot)
+            {
+                ShootAttack(); // Tấn công tầm xa cho nhân vật mới
+            }
+            else
+            {
+                Attack(); // Tấn công cận chiến cho nhân vật cũ
+            }
+
             lastAttackTime = Time.time;
         }
+    }
+
+    void ShootAttack()
+    {
+        // 1. Kích hoạt Animation
+        animator.SetTrigger("Attack");
+
+        // 2. Tìm quả cầu lửa đang rảnh (Active = false)
+        int index = FindFireball();
+
+        // 3. Thiết lập vị trí và hướng
+        if (fireballs[index] != null)
+        {
+            // Đặt vị trí về FirePoint
+            fireballs[index].transform.position = firePoint.position;
+
+            // Quan trọng: Phải Active trước khi gọi SetDirection
+            fireballs[index].SetActive(true);
+
+            // Truyền hướng dựa trên Scale của Player (1 hoặc -1)
+            float direction = Mathf.Sign(transform.localScale.x);
+            fireballs[index].GetComponent<Projectile>().SetDirection(direction);
+        }
+    }
+
+    private int FindFireball()
+    {
+        for (int i = 0; i < fireballs.Length; i++)
+        {
+            if (!fireballs[i].activeInHierarchy)
+                return i;
+        }
+        return 0; // Nếu tất cả đang bay, lấy cái đầu tiên (hoặc có thể mở rộng mảng)
     }
 
     private void HandleDash()

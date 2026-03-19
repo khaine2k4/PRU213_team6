@@ -11,6 +11,7 @@ TagManager:
   - Enemy
   - Key
   - Door
+  - Fireball
   layers:
   - Default
   - TransparentFX
@@ -20,7 +21,7 @@ TagManager:
   - UI
   - Ground
   - Enemy
-  - 
+  - FireballHolder
   - 
   - 
   - 
@@ -50,6 +51,9 @@ TagManager:
     locked: 0
   - name: BackGround
     uniqueID: 1327858775
+    locked: 0
+  - name: Fireball
+    uniqueID: 3208213685
     locked: 0
   - name: Ground
     uniqueID: 2645924879
