@@ -244,7 +244,7 @@ public class BossController : MonoBehaviour, ISaveable
     {
         if (playerHealth == null) return;
 
-        playerHealth.TakeDamage(dmg);
+        playerHealth.TakeDamage(dmg, transform.position);
 
         if (rb != null) rb.position += Vector2.up * playerIFrameNudge;
     }

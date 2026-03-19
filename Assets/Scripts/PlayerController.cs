@@ -15,6 +15,12 @@ public class PlayerController : MonoBehaviour, ISaveable
     [SerializeField] private float attackCooldown = 0.5f;
     private float lastAttackTime = 0f;
 
+    [Header("Defense Settings")]
+    [SerializeField] private KeyCode blockKey = KeyCode.K;
+    [SerializeField, Range(0f, 1f)] private float blockedDamageMultiplier = 0.2f;
+    [SerializeField] private float perfectBlockWindow = 0.15f;
+    [SerializeField, Range(30f, 180f)] private float blockFrontAngle = 120f;
+
     private bool isGrounded;
     private Animator animator;
     private Rigidbody2D rb;
@@ -31,8 +37,17 @@ public class PlayerController : MonoBehaviour, ISaveable
     [SerializeField] private float dashDuration = 0.1f;
 
     private bool isDashing = false;
+    private bool isBlocking = false;
+    private bool hasBlockingAnimParam = false;
+    private float blockStartTime = -999f;
+    private bool lastShieldUIState = false;
 
     [SerializeField] private GameObject dashEffectObject;
+    [SerializeField] private GameObject shieldUIObject;
+
+    public bool IsBlocking => isBlocking;
+    public float BlockedDamageMultiplier => blockedDamageMultiplier;
+    public bool IsPerfectBlocking => isBlocking && Time.time <= blockStartTime + perfectBlockWindow;
     
 
 
@@ -43,6 +58,18 @@ public class PlayerController : MonoBehaviour, ISaveable
         rb = GetComponent<Rigidbody2D>();
         gameManager = FindAnyObjectByType<GameManager>();
         audioManager = FindAnyObjectByType<AudioManager>();
+
+        if (animator != null)
+        {
+            foreach (AnimatorControllerParameter param in animator.parameters)
+            {
+                if (param.type == AnimatorControllerParameterType.Bool && param.name == "isBlocking")
+                {
+                    hasBlockingAnimParam = true;
+                    break;
+                }
+            }
+        }
     }
 
     void Start()
@@ -59,12 +86,20 @@ public class PlayerController : MonoBehaviour, ISaveable
         {
             dashEffectObject.SetActive(false);
         }
+
+        if (shieldUIObject != null)
+        {
+            shieldUIObject.SetActive(false);
+            lastShieldUIState = false;
+        }
     }
 
     void Update()
     {
         if (gameManager.IsGameOver() || gameManager.IsGameWin()) return;
 
+        HandleBlock();
+        SyncShieldUI();
         HandleMovement();
         HandleJump();
         HandleAttack();
@@ -81,6 +116,12 @@ public class PlayerController : MonoBehaviour, ISaveable
     {
         if (isDashing) return;
 
+        if (isBlocking)
+        {
+            rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+            return;
+        }
+
         float moveInput = Input.GetAxis("Horizontal");
         rb.linearVelocity = new Vector2(moveInput * moveSpeed, rb.linearVelocity.y);
         if (moveInput > 0) transform.localScale = new Vector3(1, 1, 1);
@@ -89,6 +130,8 @@ public class PlayerController : MonoBehaviour, ISaveable
 
     private void HandleJump()
     {
+        if (isBlocking) return;
+
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
@@ -99,6 +142,8 @@ public class PlayerController : MonoBehaviour, ISaveable
 
     private void HandleAttack()
     {
+        if (isBlocking) return;
+
         if (Input.GetKeyDown(KeyCode.J) && Time.time >= lastAttackTime + attackCooldown)
         {
             Attack();
@@ -106,8 +151,52 @@ public class PlayerController : MonoBehaviour, ISaveable
         }
     }
 
+    private void HandleBlock()
+    {
+        if (isDashing)
+        {
+            isBlocking = false;
+            return;
+        }
+
+        bool isHoldingBlock = Input.GetKey(blockKey);
+
+        if (isHoldingBlock && !isBlocking)
+        {
+            blockStartTime = Time.time;
+        }
+
+        isBlocking = isHoldingBlock;
+    }
+
+    private void SyncShieldUI()
+    {
+        if (shieldUIObject == null) return;
+        if (lastShieldUIState == isBlocking) return;
+
+        shieldUIObject.SetActive(isBlocking);
+        lastShieldUIState = isBlocking;
+    }
+
+    public bool CanBlockAttackFrom(Vector2 attackerPosition)
+    {
+        if (!isBlocking) return false;
+
+        Vector2 toAttacker = attackerPosition - (Vector2)transform.position;
+        if (toAttacker.sqrMagnitude < 0.0001f) return true;
+
+        toAttacker.Normalize();
+        float facingX = transform.localScale.x >= 0f ? 1f : -1f;
+        Vector2 forward = new Vector2(facingX, 0f);
+        float minDot = Mathf.Cos((blockFrontAngle * 0.5f) * Mathf.Deg2Rad);
+
+        return Vector2.Dot(forward, toAttacker) >= minDot;
+    }
+
     private void HandleDash()
     {
+        if (isBlocking) return;
+
         if (Input.GetKeyDown(KeyCode.LeftShift) && !isDashing)
         {
             Dash();
@@ -178,6 +267,11 @@ public class PlayerController : MonoBehaviour, ISaveable
         animator.SetBool("isRunning", isRunning);
         bool isJumping = !isGrounded;
         animator.SetBool("isJumping", isJumping);
+
+        if (hasBlockingAnimParam)
+        {
+            animator.SetBool("isBlocking", isBlocking);
+        }
     }
 
     public void EquipWeapon(int damageBonus)
