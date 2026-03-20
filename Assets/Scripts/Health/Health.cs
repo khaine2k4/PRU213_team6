@@ -91,4 +91,10 @@ public class Health : MonoBehaviour
     }
 
     public float GetHealthPercentage() => currentHealth / startingHealth;
+
+    public void Heal(float amount)
+    {
+        if (amount <= 0f) return;
+        currentHealth = Mathf.Clamp(currentHealth + amount, 0f, startingHealth);
+    }
 }

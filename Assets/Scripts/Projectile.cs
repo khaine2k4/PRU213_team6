@@ -33,6 +33,8 @@ public class Projectile : MonoBehaviour
         // 2. Kiểm tra nếu chạm vào Kẻ địch (Enemy) hoặc Boss
         if (collision.CompareTag("Enemy"))
         {
+            bool dealtDamage = false;
+
             // Thử lấy script Health hoặc Enemy/Boss để trừ máu
             // Giả sử bạn dùng hệ thống Health chung cho tất cả
             Health enemyHealth = collision.GetComponent<Health>();
@@ -40,15 +42,33 @@ public class Projectile : MonoBehaviour
             if (enemyHealth != null)
             {
                 enemyHealth.TakeDamage(17); // Gây 1 sát thương (hoặc dùng biến damage tùy chỉnh)
+                dealtDamage = true;
             }
             else
             {
                 // Nếu bạn không dùng script Health chung, hãy gọi trực tiếp script Enemy
                 Enemy enemy = collision.GetComponent<Enemy>();
-                if (enemy != null) enemy.TakeDamage(17);
+                if (enemy != null)
+                {
+                    enemy.TakeDamage(17);
+                    dealtDamage = true;
+                }
 
                 BossController boss = collision.GetComponent<BossController>();
-                if (boss != null) boss.TakeDamage(17);
+                if (boss != null)
+                {
+                    boss.TakeDamage(17);
+                    dealtDamage = true;
+                }
+            }
+
+            if (dealtDamage)
+            {
+                PlayerController player = FindAnyObjectByType<PlayerController>();
+                if (player != null)
+                {
+                    player.OnDealDamage();
+                }
             }
         }
 

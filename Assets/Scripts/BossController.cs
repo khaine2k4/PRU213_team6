@@ -108,8 +108,14 @@ public class BossController : MonoBehaviour, ISaveable
         PlayerController playerController = FindAnyObjectByType<PlayerController>();
         if (playerController != null) playerController.GainExp(10);
 
+        GameManager gameManager = FindAnyObjectByType<GameManager>();
+        if (gameManager != null)
+        {
+            gameManager.GameWin();
+        }
+
         Debug.Log("Boss die");
-        Destroy(gameObject, destroyDelay);
+        Destroy(gameObject);
     }
 
     // ===== LOOP =====

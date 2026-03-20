@@ -62,6 +62,7 @@ public class PlayerData
     public int currentLevel;
     public int currentExp;
     public int expToNextLevel;
+    public float lifeStealAmount;
 }
 
 /// <summary>

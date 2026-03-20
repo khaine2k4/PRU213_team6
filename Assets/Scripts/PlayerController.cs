@@ -46,6 +46,7 @@ public class PlayerController : MonoBehaviour, ISaveable
     public int currentLevel = 1;
     public int currentExp = 0;
     private int expToNextLevel = 10;
+    [SerializeField] private float lifeStealAmount = 0.5f;
     public GameObject weaponOnHand;
     private bool hasWeapon = false;
     public float dashForce = 20f;
@@ -56,6 +57,7 @@ public class PlayerController : MonoBehaviour, ISaveable
     private bool hasBlockingAnimParam = false;
     private float blockStartTime = -999f;
     private bool lastShieldUIState = false;
+    private Health playerHealth;
 
     [SerializeField] private GameObject dashEffectObject;
     [SerializeField] private GameObject shieldUIObject;
@@ -78,6 +80,7 @@ public class PlayerController : MonoBehaviour, ISaveable
         gameManager = FindAnyObjectByType<GameManager>();
         audioManager = FindAnyObjectByType<AudioManager>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        playerHealth = GetComponent<Health>();
         if (spriteRenderer != null) originalColor = spriteRenderer.color;
 
         currentStamina = maxStamina;
@@ -356,6 +359,7 @@ public class PlayerController : MonoBehaviour, ISaveable
             if (boss != null)
             {
                 boss.TakeDamage(currentDamage);
+                ApplyLifeSteal();
                 continue;
             }
 
@@ -363,6 +367,7 @@ public class PlayerController : MonoBehaviour, ISaveable
             if (enemy != null)
             {
                 enemy.TakeDamage(currentDamage);
+                ApplyLifeSteal();
             }
 
         }
@@ -407,9 +412,25 @@ public class PlayerController : MonoBehaviour, ISaveable
             currentLevel++;
             expToNextLevel *= 2;
             currentDamage += 1;
-            Debug.Log($"Level Up! Level: {currentLevel}, Damage: {currentDamage}, EXP cần cho level tiếp: {expToNextLevel}");
+            lifeStealAmount += 0.5f;
+            if (playerHealth != null)
+            {
+                playerHealth.Heal(1f);
+            }
+            Debug.Log($"Level Up! Level: {currentLevel}, Damage: {currentDamage}, Lifesteal: {lifeStealAmount}, EXP cần cho level tiếp: {expToNextLevel}");
         }
         Debug.Log($"EXP: {currentExp}/{expToNextLevel}");
+    }
+
+    private void ApplyLifeSteal()
+    {
+        if (playerHealth == null) return;
+        playerHealth.Heal(lifeStealAmount);
+    }
+
+    public void OnDealDamage()
+    {
+        ApplyLifeSteal();
     }
 
     private void OnDrawGizmosSelected()
@@ -435,10 +456,11 @@ public class PlayerController : MonoBehaviour, ISaveable
             weaponActive = weaponOnHand != null && weaponOnHand.activeSelf,
             currentLevel = currentLevel,
             currentExp = currentExp,
-            expToNextLevel = expToNextLevel
+            expToNextLevel = expToNextLevel,
+            lifeStealAmount = lifeStealAmount
         };
         
-        Debug.Log($"Player Save: Pos({data.posX:F1},{data.posY:F1}), HP:{data.health}, Stamina:{data.currentStamina:F0}, Damage:{data.damage}, Weapon:{data.hasWeapon}, Level:{data.currentLevel}, EXP:{data.currentExp}/{data.expToNextLevel}");
+        Debug.Log($"Player Save: Pos({data.posX:F1},{data.posY:F1}), HP:{data.health}, Stamina:{data.currentStamina:F0}, Damage:{data.damage}, Weapon:{data.hasWeapon}, Level:{data.currentLevel}, EXP:{data.currentExp}/{data.expToNextLevel}, Lifesteal:{data.lifeStealAmount}");
         return data;
     }
 
@@ -469,8 +491,9 @@ public class PlayerController : MonoBehaviour, ISaveable
             currentLevel = playerData.currentLevel > 0 ? playerData.currentLevel : 1;
             currentExp = playerData.currentExp;
             expToNextLevel = playerData.expToNextLevel > 0 ? playerData.expToNextLevel : 10;
+            lifeStealAmount = playerData.lifeStealAmount > 0 ? playerData.lifeStealAmount : 0.5f;
 
-            Debug.Log($"Player Load: Pos({playerData.posX:F1},{playerData.posY:F1}), HP:{playerData.health}, Stamina:{currentStamina:F0}, Damage:{playerData.damage}, Weapon:{playerData.hasWeapon}, Level:{currentLevel}, EXP:{currentExp}/{expToNextLevel}");
+            Debug.Log($"Player Load: Pos({playerData.posX:F1},{playerData.posY:F1}), HP:{playerData.health}, Stamina:{currentStamina:F0}, Damage:{playerData.damage}, Weapon:{playerData.hasWeapon}, Level:{currentLevel}, EXP:{currentExp}/{expToNextLevel}, Lifesteal:{lifeStealAmount}");
         }
     }
 }
