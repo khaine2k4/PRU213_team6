@@ -54,6 +54,8 @@ public class PlayerData
     public float posY;
     public float posZ;
     public float health;
+    public float currentStamina;
+    public float maxStamina;
     public int damage;
     public bool hasWeapon;
     public bool weaponActive;
