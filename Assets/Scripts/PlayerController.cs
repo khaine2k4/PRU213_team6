@@ -27,6 +27,8 @@ public class PlayerController : MonoBehaviour, ISaveable
     [SerializeField] private float jumpStaminaCost = 15f;
     [SerializeField] private float dashStaminaCost = 30f;
     [SerializeField] private float staminaRegenDelay = 1f;
+    [SerializeField, Range(0f, 1f)] private float lowStaminaSpeedMultiplier = 0.5f;
+    [SerializeField] private float lowStaminaThreshold = 20f;
 
     private float currentStamina;
     private float lastStaminaUseTime;
@@ -145,7 +147,15 @@ public class PlayerController : MonoBehaviour, ISaveable
         }
 
         float moveInput = Input.GetAxis("Horizontal");
-        rb.linearVelocity = new Vector2(moveInput * moveSpeed, rb.linearVelocity.y);
+        
+        // Calculate move speed based on stamina
+        float effectiveMoveSpeed = moveSpeed;
+        if (currentStamina < lowStaminaThreshold)
+        {
+            effectiveMoveSpeed *= lowStaminaSpeedMultiplier;
+        }
+
+        rb.linearVelocity = new Vector2(moveInput * effectiveMoveSpeed, rb.linearVelocity.y);
         if (moveInput > 0) transform.localScale = new Vector3(1, 1, 1);
         else if (moveInput < 0) transform.localScale = new Vector3(-1, 1, 1);
     }
